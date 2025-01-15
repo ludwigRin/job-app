@@ -13,7 +13,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::all();
+
+        return view('categories.index', compact('categories'));
     }
 
     /**
@@ -21,7 +23,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return view('categories.create');
     }
 
     /**
@@ -29,7 +31,16 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        //
+        // validates the data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        // creates a new category with the validated data
+        Category::create($validatedData);
+
+        // returns user back to category list
+        return redirect()->route('categories.index');
     }
 
     /**
@@ -37,7 +48,8 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        // displays the details of a specific category
+        return view('categories.show', compact('category'));
     }
 
     /**
@@ -45,7 +57,8 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        // returns a view to edit a category
+        return view('categories.edit', compact('category'));
     }
 
     /**
@@ -53,7 +66,16 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        //
+        // validates the data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        // updates the selected category with the validated data
+        $category->update($validatedData);
+        
+        // redirects the user to the category list
+        return redirect()->route('categories.index');
     }
 
     /**
@@ -61,6 +83,10 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        // deletes the category
+        $category->delete();
+
+        // redirects the user to category list
+        return redirect()->route('categories.index');
     }
 }
