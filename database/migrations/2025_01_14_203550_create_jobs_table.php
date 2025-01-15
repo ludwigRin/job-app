@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('working_hours');
             $table->longText('description');
             $table->foreignId('user_id')->constrained();
-            $$table->foreignId('category_id')->constrained();
+            $table->foreignId('category_id')->constrained();
             $table->foreignId('company_id')->constrained();
         });
     }

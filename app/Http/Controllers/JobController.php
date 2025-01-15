@@ -37,11 +37,23 @@ class JobController extends Controller
             'working_hours' => 'required|integer|min:1',
             'description' => 'required|string',
             'company_id' => 'required|exists:companies,id',
-            'category_id' => 'required|exists:category,id',
+            'category_name' => 'required|string|max:255',
         ]);
 
-        // creates a new job with the validated data
-        Job::create($validatedData);
+        // checks if a category with the name provided in the $validatedData already exist and if not creates it 
+        $category = Category::firstOrCreate([
+            'name' => $validatedData['category_name']
+        ]);
+
+        // creates a new job with the validated data and assigns the current user as owner
+        $job = new Job();
+        $job->title = $validatedData['title'];
+        $job->working_hours = $validatedData['working_hours'];
+        $job->description = $validatedData['description'];
+        $job->company_id = $validatedData['company_id'];
+        $job->category_id = $category->id;
+        $job->user_id = auth()->id(); 
+        $job->save();
 
         // returns user back to job list
         return redirect()->route('jobs.index');
@@ -76,8 +88,17 @@ class JobController extends Controller
             'working_hours' => 'required|integer|min:1',
             'description' => 'required|string',
             'company_id' => 'required|exists:companies,id',
-            'category_id' => 'required|exists:category,id',
+            'category_name' => 'required|string|max:255',
         ]);
+
+        // checks if a category with the name provided in the $validatedData already exist and if not creates it 
+        $category = Category::firstOrCreate([
+            'name' => $validatedData['category_name']
+        ]);        
+
+        //removes the category name from the array and adds the category id
+        unset($validatedData['category_name']);
+        $validatedData['category_id'] = $category->id;
 
         // updates the selected job with the validated data
         $job->update($validatedData);
