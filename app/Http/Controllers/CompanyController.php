@@ -13,7 +13,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        //
+        $companies = Company::all();
+
+        return view('companies.index', compact('companies'));
     }
 
     /**
@@ -21,7 +23,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        //
+        return view('companies.create');
     }
 
     /**
@@ -29,7 +31,18 @@ class CompanyController extends Controller
      */
     public function store(StoreCompanyRequest $request)
     {
-        //
+        // validates the data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        // creates a new company with the validated data
+        Company::create($validatedData);
+
+        // returns user back to company list
+        return redirect()->route('companies.index');
     }
 
     /**
@@ -37,7 +50,8 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        //
+        // displays the details of a specific company
+        return view('companies.show', compact('company'));
     }
 
     /**
@@ -45,7 +59,8 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        //
+        // returns a view to edit a company
+        return view('companies.edit', compact('company'));
     }
 
     /**
@@ -53,7 +68,18 @@ class CompanyController extends Controller
      */
     public function update(UpdateCompanyRequest $request, Company $company)
     {
-        //
+        // validates the data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        // updates the selected company with the validated data
+        $company->update($validatedData);
+        
+        // redirects the user to the company list
+        return redirect()->route('companies.index');
     }
 
     /**
@@ -61,6 +87,10 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
-        //
+        // deletes the company
+        $company->delete();
+
+        // redirects the user to company list
+        return redirect()->route('companies.index');
     }
 }
