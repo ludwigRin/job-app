@@ -13,7 +13,9 @@ class JobController extends Controller
      */
     public function index()
     {
-        //
+        $jobs = Job::all();
+
+        return view('jobs.index', compact('jobs'));
     }
 
     /**
@@ -21,7 +23,7 @@ class JobController extends Controller
      */
     public function create()
     {
-        //
+        return view('jobs.create');
     }
 
     /**
@@ -29,7 +31,20 @@ class JobController extends Controller
      */
     public function store(StoreJobRequest $request)
     {
-        //
+        // validates the data
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'working_hours' => 'required|integer|min:1',
+            'description' => 'required|string',
+            'company_id' => 'required|exists:companies,id',
+            'category_id' => 'required|exists:category,id',
+        ]);
+
+        // creates a new job with the validated data
+        Job::create($validatedData);
+
+        // returns user back to job list
+        return redirect()->route('jobs.index');
     }
 
     /**
@@ -37,7 +52,8 @@ class JobController extends Controller
      */
     public function show(Job $job)
     {
-        //
+        // displays the details of a specific job
+        return view('jobs.show', compact('job'));
     }
 
     /**
@@ -45,7 +61,8 @@ class JobController extends Controller
      */
     public function edit(Job $job)
     {
-        //
+        // returns a view to edit a job
+        return view('jobs.edit', compact('job'));
     }
 
     /**
@@ -53,7 +70,20 @@ class JobController extends Controller
      */
     public function update(UpdateJobRequest $request, Job $job)
     {
-        //
+        // validates the data
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'working_hours' => 'required|integer|min:1',
+            'description' => 'required|string',
+            'company_id' => 'required|exists:companies,id',
+            'category_id' => 'required|exists:category,id',
+        ]);
+
+        // updates the selected job with the validated data
+        $job->update($validatedData);
+        
+        // redirects the user to the job list
+        return redirect()->route('jobs.index');
     }
 
     /**
@@ -61,6 +91,10 @@ class JobController extends Controller
      */
     public function destroy(Job $job)
     {
-        //
+        // deletes the passed job
+        $job->delete();
+
+        // redirects the user to job list
+        return redirect()->route('jobs.index');
     }
 }
