@@ -13,7 +13,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::all(); 
+
+        return view('users.index', compact('users'));
     }
 
     /**
@@ -21,7 +23,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('users.create');
     }
 
     /**
@@ -29,7 +31,20 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        //
+        // validates the data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'password' => 'required|string|min:1|max:255',
+        ]);
+
+        // hashes the password
+        $validatedData['password'] = Hash::make($validatedData['password']);
+
+        // creates a new user with the validated data
+        User::create($validatedData);
+
+        // redirects the user to the home page
+        return redirect()->route('home');
     }
 
     /**
@@ -37,7 +52,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        // shows user profile
+        return view('users.show', compact('user'));
     }
 
     /**
@@ -45,7 +61,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        // returns a view to edit the user profile
+        return view('users.edit', compact('user'));
     }
 
     /**
@@ -53,7 +70,17 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        // validates the data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'password' => 'required|string|min:1|max:255',
+        ]);
+
+        // updates the user profile with the validated data
+        $user->update($validatedData);
+        
+        // redirects the user to the profile 
+        return redirect()->route('users.show');
     }
 
     /**
@@ -61,6 +88,16 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        // deletes the users company
+        $user->companies()->delete();
+        
+        // deletes the jobs created by this user
+        $user->jobs()->delete();
+        
+        // deletes the users account
+        $user->delete();
+
+        // redirects the user to the home page
+        return redirect()->route('home');
     }
 }
