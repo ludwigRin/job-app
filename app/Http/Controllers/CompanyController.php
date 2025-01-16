@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 
@@ -32,14 +33,17 @@ class CompanyController extends Controller
     public function store(StoreCompanyRequest $request)
     {
         // validates the data
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'user_id' => 'required|exists:users,id',
         ]);
 
         // creates a new company with the validated data
-        Company::create($validatedData);
+        $company = Company::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'user_id' => auth()->id(), 
+        ]);
 
         // returns user back to company list
         return redirect()->route('companies.index');

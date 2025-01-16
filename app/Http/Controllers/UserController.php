@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 
@@ -53,7 +54,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         // shows user profile
-        return view('users.show', compact('user'));
+        return view('profile.show', compact('user'));
     }
 
     /**
